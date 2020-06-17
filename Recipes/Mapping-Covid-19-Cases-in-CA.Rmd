@@ -24,6 +24,7 @@ The data wrangling steps are:
 3. I reorganize the Covid-19 case data. There are certainly more elegant ways to do this...what I have here is a little hacky but it works.
 
 ```{r include=F}
+library(here)
 library(dplyr)
 library(data.table)
 library(sf)
@@ -38,16 +39,13 @@ library(ggrepel)
 covid.county <- read.csv("https://raw.githubusercontent.com/nytimes/covid-19-data/master/us-counties.csv")
 
 # Next get the county boundaries from Census TIGER Lines and change the county field name
-county.lines <- st_read('data/shapefiles/tl_2019_us_county/tl_2019_us_county.shp') %>%
-                 mutate(county=NAME)
-
-ca.lines <- county.lines %>% filter(STATEFP=='06')
+ca.lines <- st_read(here('data/CA_Counties','CA_Counties_TIGER2016.shp')) 
 str(ca.lines)
 ```
 
 ```{r}
 # Next get 2019 county population and fix the names
-CA.pop <- read.csv('data/CA-county-pop.csv')
+CA.pop <- read.csv(here('data','CA-county-pop.csv'))
 CA.pop$county <- trimws(gsub("County, California","",CA.pop$County))
 ```
 
@@ -115,7 +113,7 @@ ca.cases <- ca.cases %>% left_join(CA.pop,by=c('county')) %>%
                arrange(county,date) %>% group_by(county) %>%
                 filter(row_number()==n())
 
-ca.lines <- county.lines %>% filter(STATEFP=='06') %>% 
+ca.lines <- ca.lines %>% mutate(county=NAME) %>% 
               left_join(ca.cases,by=c('county'))
 ```
 
