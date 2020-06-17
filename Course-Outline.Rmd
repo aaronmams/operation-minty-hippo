@@ -1,0 +1,98 @@
+---
+title: "R Course Outline"
+author: "aaron mamula"
+date: "2/25/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# {.tabset .tabset-fade .tabset-pills}
+
+## Course Design
+
+I've organized the lessons for this course into two partitions: Skills and Recipes.
+
+Skills are lessons oriented towards *doing* tasks (importing data, cleaning data, visualizing data, etc.).
+
+Recipes are vignettes focused on *making* things.
+
+The dichotomy of *doing* things versus *making* things is certainly not perfect. My hope is that the *Skills* portion provides enough foundational material to get us all comfortable with basic data operations. Then the *Recipes* portion hopefully builds on that foundation by illustrating how the various skills can be folded together to form a reproducable piece of analysis. 
+
+## Skills {.tabset .tabset-fade .tabset-pills}
+
+This Skills portion of the course was developed around a set of data-centric and data-adjacent tasks that I percieve to be ubiquitous among social science researchers. The lessons are as follows (links to individual lessons are provided):
+
+1. [Importing Data](https://github.com/aaronmams/operation-minty-hippo/blob/master/Skills/Skill-1-Data-Import-v.1.Rmd)
+2. [Defining Data](https://github.com/aaronmams/operation-minty-hippo/blob/master/Skills/Skill-2-Data-Types-and-Structures.Rmd)
+3. [Wrangling Data](https://github.com/aaronmams/operation-minty-hippo/blob/master/Skills/Skill-3-Data-Wrangling.Rmd)
+4. [Visualizing Data](https://github.com/aaronmams/operation-minty-hippo/blob/master/Skills/Skill-4-Introductory-Data-Visualization.Rmd)
+5. [Data Pipelines](https://github.com/aaronmams/operation-minty-hippo/blob/master/Skills/Skill-5-Advanced-Data-Import-v.1.Rmd) and [Data Streams](https://github.com/aaronmams/operation-minty-hippo/blob/master/Skills/Skill-5-Advanced-Data-Import-v.2.Rmd)
+6. [Advanced Data Visualization](https://github.com/aaronmams/operation-minty-hippo/blob/master/Skills/Skill-6-Advanced-Data-Visualization.Rmd)
+
+## Recipes {.tabset}
+
+My hope is that the Recipes section will serve two primary functions:
+
+1. provide some reproducable data analysis of the "approachable-to-mildly-intimidating" variety that can be used to practice skills, and
+
+2. provide some inspiration in the form of polished finished products that showcase interesting things that can be done with R.
+
+### Classic Social Science Problems
+
+[Causal Inference with R](https://github.com/aaronmams/operation-minty-hippo/blob/master/Recipes/Recipe-3-Synthetic-Control.Rmd)
+
+### Workflows and Integrations
+
+[Module 8: R Studio + Github]()
+
+### Advanced Visualization
+
+In my head I'm drawning a distinction between 'data exploration' and production quality graphics. The latter I'm thinking are things like leaflet maps and interactive visuals...I'm open to being talked out of this heirarchy.
+
+[Data Rich Maps with sf and Census Data](https://github.com/aaronmams/operation-minty-hippo/blob/master/Module-9-Advanced-Visualizations-v.1.Rmd)
+
+[More Data Rich Maps with Covid-19 Data](https://github.com/aaronmams/operation-minty-hippo/blob/master/Recipes/Mapping-Covid-19-Cases-in-CA.Rmd)
+
+[R Shiny]()
+
+- I'm proposing to do R Shiny after workflow stuff because I think the shinyapp.io option will be more natural if it follows an introduction to R Studio Cloud....but I'm open to folding this in with Data Wrangling. 
+
+### Text Mining/Content Analysis
+
+[Mining Twitter for Sentiment Analysis](https://github.com/aaronmams/operation-minty-hippo/blob/master/Recipes/Recipe-4-Text-Mining.Rmd)
+
+### VMS
+
+* A VMS example
+    + pull VMS tracks from a remote database (RODBC, dplyr, tidyr skills)
+    + merge with fish ticket data (dplyr and other data wrangling skills)
+    + use a shapefile basemap and the sf package to classify ports as "in-port" v. "at-sea" (working with shapefiles and other spatial data using the simple features package)
+
+
+### Voting Analysis
+
+* A "voting" example
+    + use Census Bureau API to get congressional district boundaries and some data (data acquisition skills)
+    + get election results by congressional district (more data acquisition skills)
+    + do some analysis on voting patterns ()
+
+I have some data sets on congressional district spatial boundaries, characteristics, and voting patterns here:
+
+[https://github.com/aaronmams/R-spatial/tree/master/R](https://github.com/aaronmams/R-spatial/tree/master/R)
+
+### Machine Learning
+
+I have a project I presented to our lab's R Workgroup on using the Caret Package to train/test machine learning pipelines. I could totally recycle this...or somebody else could maybe do a machine learning thing.
+
+### Other Ideas
+
+* other API-centric stuff (Google Trends??)
+* other cool mapping stuff (I've heard a lot of an R bridge to ArcGIS but I've only really used the simple features package for spatial analysis and mapping stuff)
+* any cool bayesian stuff?? I know there is an R Exention of Gelman's STAN but I haven't used it.
+
+### Time Series
+
+https://aaronmams.github.io/State-Space-Models-with-Seasonal-Data/
