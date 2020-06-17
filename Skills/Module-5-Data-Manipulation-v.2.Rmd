@@ -1,0 +1,249 @@
+---
+title: "Module-5-Data-Manipulation-v.2"
+author: "aaron mamula"
+date: "5/26/2020"
+output: html_document
+---
+
+# {.tabset .tabset-fade .tabset-pills}
+
+My intention is to keep this lesson short. My motivation for this abbreviated treatment is necessity. Social Scientists work with data from an incredibly wide range of sources and data are often organized in all sorts of weird ways. Since I can't possibly anticipate all the ways that you will need to trim or accessorize your data, I'm striving here for a very general introduction to a few libraries that make it easy to massage data.
+
+If I had to distill this lesson down to some recommendations, they would be:
+
+* "long" data are often easier to use than "wide" data ([Simon Ejdemyr lists 3 compelling reasons why long data are better](https://sejdemyr.github.io/r-tutorials/basics/wide-and-long/))
+* dplyr and tidyr have a lot of nice/user-friendly methods both for organzing data in "long" form and working with data in "long" form. 
+
+## The apply family
+
+### apply with vectors/matricies
+
+First, let me share something important [from Alyssa Frazee](http://alyssafrazee.com/2014/01/29/vectorization.html):
+
+>apply “is not vectorization, it is loop-hiding.”
+
+That probably doesn't mean much to you right now...but it will.
+
+In compiled languages like C or Fortran it's pretty common to alter data using loops. In the last lesson we discussed how R's vectorized orientation avoids using "for loops"" for many operations. For example, getting the natural log of all the numbers in a vector in R is a simple matter of feeding the vector into the log() function:
+
+```{r}
+# vector of uniform random numbers between 0,1
+x <- runif(10)
+names(x) <- c(1:length(x))
+x  
+```
+```{r}
+# natural log of this vector
+log.x <- log(x)
+names(log.x) <- paste("log.x",c(1:length(x)),sep="")
+log.x
+```
+
+There is another way to accomplish the task of calculating the natural log of each number in a vector. We can use the ```apply``` function. The ```apply``` function works very intuitively in that it applies a function to an object. In this case we want to apply the function ```log()``` to each element in the vector x:
+
+```{r}
+sapply(x,FUN=log)
+
+```
+
+Ok, I did something a little cheeky there and used ```sapply()```. In R, ```apply()``` is actually a family of functions including ```apply()```, ```lapply()```, ```sapply()```, ```tapply()```, ```mapply()```, and probably a few more. These flavors have the same basic features and they differ somewhat in the data structures they expect as inputs and the data structures they return as outputs.
+
+Strictly speaking the ```apply()``` function is meant for use with with multi-dimensional arrays, matricies, or data frames. Example: taking the natural log of each element in a matrix:
+
+```{r}
+X <- matrix(c(0,1,2,3),nr=2,nc=2)
+X
+# Natural log of the elements of the matrix X
+apply(X,1,FUN=log)
+```
+
+If you plan on using the ```apply()``` family, it's important to understand how results are returned. The function ```apply()``` accepts the following inputs in the following order:
+
+1. the object to operate on (X)
+2. the margin to apply the function over (1 = rows, 2 = columns)
+3. the function to be applied
+
+Note that, in the example above, we applied the ```log()``` function across the rows of the object ```X```. 
+
+```{r}
+X[1,]
+log(X[1,])
+apply(X,1,log)
+```
+
+To understand why this output is the way it is, let's look at R's default behavior for organizing matricies:
+
+```{r}
+matrix(c(log(X[1,]),log(X[2,])),nr=2,nc=2)
+```
+
+In this case the vector ```c(log(X[1,]),log(X[2,]))``` evaluates to ```(-Inf,0.6931472,0,1.098612)```. When we tell R to organize this 4 element vector as a 2X2 matrix, R fills in the blanks column-wise.
+
+### apply with data frames
+
+The ```apply()``` functions work with data frames as well as vectors, matricies, and lists. However, when I'm working with real-life data, I almost never use the ```apply()``` offerings. I don't have anything against them, I just haven't in 12 years encountered a really compelling use-case for using ```apply()``` with data frames.
+
+If you wanted to say turn all of your data values into natural logs you could do that using ```apply()```:
+
+
+```{r}
+z <- data.frame(score1=runif(10,50,100),score2=runif(10,50,100),score3=runif(10,50,100))
+z
+```
+```{r}
+apply(z,2,log)
+```
+
+This is potentially useful but, again, just not something that I find myself doing very often. More often, I have some data and I need to transform particular columns while leaving others unchanged. Example:
+
+```{r}
+z <- data.frame(student=c(1:10),gender=c(sample(c("M","F"),10,replace=T)),Math=runif(10,50,100),Reading=runif(10,50,100),Science=runif(10,50,100))
+z
+```
+
+A simple way to log just the test scores while leaving student idenfier and gender unchanged is:
+
+```{r}
+z$Math <- log(z$Math)
+z$Reading <- log(z$Reading)
+z$Science <- log(z$Science)
+z
+```
+
+The knock on this approach is that it's not elegant, maybe a little inefficient, and potentially not generalizable if we have like 20 more columns of different subject scores.
+
+Those things are all true and we could absolutely write a really cool function to efficiently find all the test score columns and log them...but:
+
+1. at this point in the course we probably don't need to let the perfect be the enemy of the good
+
+2. for the vast majority of social science research applications that I've seen, hyper-obsession with super-efficient code is something that involves substantial work and yeilds uncertain payoffs. 
+
+## Long Data v. Wide Data
+
+Setting the stage for my next section on dplyr and tidyr, I thought it would be responsible to offer a short diversion on "long" data versus "wide" data.
+
+Suppose we have a panel data set containing annual GDP/captia for a set of countries for 2019,2018, and 2017. A wide form representation of such data would look like this: 
+
+```{r}
+# GDP/capita by country 2019,2018,2017
+Luxembourg <- c(113196,116640,106806)
+Switzerland <- c(83716,82797,80101)
+Norway <- c(77975,81697,75295)
+USA <- c(65111,62795,60055)
+
+# World Rank
+Luxembourg.rank <- c(1,3,3)
+Switzerland.rank <- c(2,4,4)
+Norway.rank <- c(3,5,5)
+USA.rank <- c(7,10,9)
+
+gdp.wide <- data.frame(countries=c("Luxembourg","Switzerland","Norway","USA"),
+                       gdp_pc_2019=c(Luxembourg[1],Switzerland[1],Norway[1],USA[1]),
+                       gdp_pc_2018=c(Luxembourg[2],Switzerland[2],Norway[2],USA[2]),
+                       gdp_pc_2017=c(Luxembourg[3],Switzerland[3],Norway[3],USA[3]))
+gdp.wide
+```
+
+A long form representation of these data would look like this:
+
+```{r}
+gdp.long <- data.frame(countries=c(rep("Luxembourg",3),rep("Switzerland",3),rep("Norway",3),rep("US",3)),
+                       year=c(rep(c(2019,2018,2017),4)),
+                       gdp.pc=c(Luxembourg,Switzerland,Norway,USA))
+gdp.long
+```
+
+As I said in the intro, long is generally better than wide for most data analysis. I don't feel a huge moral imperative to prove this to you right now. I'm pretty confident that you'll come to the same conclusion after taking a few runs at your own data in R.
+
+## More dplyr and tidyr
+
+So in the last section I said that long is better than wide. So here is an example of some data that came to me in wide form and I used ```tidyr``` and ```dplyr``` methods to wrangle it into long form then clean it a bit.
+
+The data come from the [World Bank Development Indicators](https://databank.worldbank.org/reports.aspx?source=world-development-indicators#). They are the "School Enrollment, primary (gross), gender parity index", WDI Series Code "SE.ENR.PRIM.FM.ZS". A summary of the data series relevance as an indicator of development [is provided here](https://www.indexmundi.com/facts/indicators/SE.ENR.PRIM.FM.ZS).
+
+I have retrieved the data from 2000-2019 for 6 Regional Aggregates of Countries. I have included these data here and we can view them in thier original wide form: 
+
+```{r}
+gpi <- read.csv('data/WorldBank_GPI_2000-2018.csv')
+gpi
+```
+
+To wrangle these data into long form we can use the ```tidyr``` method ```gather()```. The first two values supplied to the ```gather()``` function are the key-value pairs that we want to use to orient the long form data. The final argument includes the column names of the original wide form data that we want to collapse.  
+
+```{r}
+library(tidyr)
+gpi.long <- gpi %>% gather(year, gpi, X2000..YR2000.:X2019..YR2019.)
+head(gpi.long)
+```
+
+Now use dplyr methods to clean up the data frame:
+
+```{r}
+library(dplyr)
+
+# the year variable is formatted in a funky way but we can use some string methods to get it into a
+# regular integer form. Note that X2000..YR2000 if pretty formulaic. If we just remove the leading "X"" then
+# take the next 4 characters in the string we'll have the 4-digit year.
+
+gpi.long <- tbl_df(gpi.long) %>% mutate(year=as.numeric(substr(gsub("X","",year),1,4)))
+gpi.long
+
+```
+
+Just a quick review:
+
+The wide form data had 6 observations (corresponding to 6 unique Country Aggregates) on 24 variables (corresponding to 20 years of GPI data + 4 identifier columns (Country.Name, Country.Code, Series.Name, Series.Code).
+
+```{r}
+str(gpi)
+```
+
+The long form data have 120 observations (6 Country Aggregates X 20 years of data) on 6 variables (the orginal 4 indentifiers + the key-value pairs year & gpi):
+
+```{r}
+str(gpi.long)
+```
+
+## A Little data.table
+
+```data.table``` is another data manipulation library. I don't know many people that regularly use ```data.table``` AND ```dplyr```, it seems that most people sort of commit themselves to one or the other. I do know a number of people that count themselves as regular users of ```data.table```. 
+
+I am not a regular ```data.table``` user but I use it occassionally. I find it especially helpful with big data frames. 
+
+[I highly recommend this Vignette](https://cran.r-project.org/web/packages/data.table/vignettes/datatable-intro.html) if you are looking to get started with ```data.table```. In fact, I'm pirating most of the remainder of this section directly from the linked Vignette.
+
+The preferred ```data.table``` way to read data is withe the ```fread()``` method: 
+```{r}
+library(data.table)
+flights <- fread("https://raw.githubusercontent.com/Rdatatable/data.table/master/vignettes/flights14.csv")
+```
+
+Something to note here is that, because we used the ```fread()``` method from the ```data.table``` library, R recognizes the data frame as a data.table object: 
+
+```{r}
+str(flights)
+```
+
+I'm not going to try and illustrate a lot of other ```data.table``` syntax (because as I said I'm not a regular user), but here is one operation that I see practicioners relying on a lot. 
+
+```{r}
+# summarize the number of flights grouped by the "origin" variable
+flights.by.origin <- flights[, .N, by = origin]
+head(flights.by.origin)
+```
+
+For more ```data.table``` practice, check out the Resources Tab.
+
+## Resources
+
+[Hadley Wickham's Primer on Tidyr](https://blog.rstudio.com/2014/07/22/introducing-tidyr/)
+
+[The Tidyverse Cheat Sheet](https://tidyr.tidyverse.org/)
+
+[I really like this discussion](http://alyssafrazee.com/2014/01/29/vectorization.html) on what "apply()" is doing.
+
+[WDI: An R Package for getting World Bank Development Indicator Data](https://www.r-project.org/nosvn/pandoc/WDI.html)
+
+[A data.table Introduction](https://cran.r-project.org/web/packages/data.table/vignettes/datatable-intro.html)
+
+[More data.table practice](https://rpubs.com/kykimeng/intro-to-data-table)

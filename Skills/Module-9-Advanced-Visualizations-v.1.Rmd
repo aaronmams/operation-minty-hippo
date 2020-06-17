@@ -1,0 +1,136 @@
+---
+title: "Module-9-Advanced-Visualizations-v.1"
+author: "aaron mamula"
+date: "5/8/2020"
+output: html_document
+---
+
+# {.tabset .tabset-fade .tabset-pills}
+
+## Introduction and Prerequisites
+
+```{r warning=F}
+library(sf)
+library(dplyr)
+library(data.table)
+library(ggplot2)
+library(RJSONIO)
+library(viridis)
+```
+
+Here's what's happening in this module: 
+
+Working with the Census Bureau ACS data from Module 7 I'm going to create an informative map using the spatial data package *sf*. The exercise will proceed more-or-less like this:
+
+* get the shapefile for CDP boundaries from the Census TIGER Data Mart
+* join the boundry shapefile with the data series 
+* create a "heatmap" of poverty indicators by CDP
+
+[The GIS files for geography boundaries can be downloaded here](https://www.census.gov/geographies/mapping-files/time-series/geo/tiger-line-file.2018.html)
+
+I have these saved the CDP boundaries for California to a folder inside the project:
+
+[https://github.com/aaronmams/operation-minty-hippo/tree/master/data/shapefiles/tl_2018_06_place](https://github.com/aaronmams/operation-minty-hippo/tree/master/data/shapefiles/tl_2018_06_place)
+
+I also grabbed the county boundry shapefile for the US:
+
+[https://github.com/aaronmams/operation-minty-hippo/tree/master/data/shapefiles/tl_2019_us_county](https://github.com/aaronmams/operation-minty-hippo/tree/master/data/shapefiles/tl_2019_us_county)
+
+## A Test Map
+
+As a first step, read the shapefile with the county boundaries and plot them just to make sure everything looks ok. 
+
+```{r}
+
+county.lines <- st_read('data/shapefiles/tl_2019_us_county/tl_2019_us_county.shp')
+
+str(county.lines)
+```
+
+The thing to note from above is that we have an data frame-looking thing that is object class *sf* with a variety of spatial data type identifiers. The [Simple Features Package](https://r-spatial.github.io/sf/articles/sf1.html) really simplifies working with spatial data because it organizes things in a familiar data-frame looking way.
+
+We can display these county boundaries on a map using the *ggplot()* method. 
+
+```{r}
+library(ggthemes)
+ca.counties <- county.lines %>% filter(STATEFP=='06')
+ggplot(ca.counties) + geom_sf() + theme_economist_white()
+```
+
+## A Real Map
+
+In the last section I made a base map. This was a map of California county boundaries. Here, I'm going to draw on the skills from [Module-7-Data-Import-v.2.2](Module-7-Data-Import-v.2.2.Rmd) and pull some data from the 2018 ACS to use with the basemap.
+
+### Get the Educational Attainment Series and Join with Spatial Boundaries
+
+The API url for collecting data at the county level is a little different than the text strings used earlier. 
+
+```{r}
+data.series.name <- 'DP02_0064PE'
+
+# my API key
+key <- "key=f5a32f694a14b28acf7301f4972eaab8551eafda"
+# the base url for Detailed Tables for the 2018 ACS 5-year
+base <- "https://api.census.gov/data/2018/acs/acs5/profile?get=NAME,"
+# geo parameters
+geo <-  "&for=county:*&in=state:06&"
+
+# paste these all together to form the API call for the poverty data series
+
+  endpoint <- paste(base,data.series.name,geo,key,sep="")
+  
+  # get json data
+  data <- fromJSON(endpoint)
+
+  # parse json object and coerce to data frame
+  edu <- tbl_df(data.frame(rbindlist(lapply(data,function(x){
+    x<-unlist(x)
+    return(data.frame(name=x[1],value=x[2],state=x[3],data_series=data.series.name))
+  })
+  ))) %>% filter(row_number() > 1)
+
+edu$value <- as.numeric(as.character(edu$value))    
+```
+
+Next, I need to join these data on educational attainment with the spatial data on county boundaries. One challenge, illustrated below, is that the naming convention is a little different. 
+
+County names from the Census ACS data:
+```{r}
+head(unique(edu$name))
+```
+
+County names from the Census boundaries shapefile:
+```{r}
+head(unique(county.lines$NAME[which(county.lines$STATEFP=='06')]))
+```
+
+It looks to me like if I just drop the "County, California" part from the ACS name identifiers than the two will be conformable. Let's try:
+
+```{r}
+# I'm changing the column label for the 'name' field in order to be conformable with the county lines
+# data. This isn't strictly necessary for a join operation but makes things easier.
+edu$NAME <- trimws(gsub("County, California","",edu$name))
+head(unique(edu$NAME))
+edu <- edu %>% select(-name)
+```
+
+Try joining and see what doesn't work
+```{r}
+
+ca.counties <- county.lines %>% filter(STATEFP=='06') %>% left_join(edu,by=c('NAME'))
+ca.counties <- st_as_sf(ca.counties)  
+```
+
+
+### Create the Map
+
+```{r}
+ggplot(ca.counties) + geom_sf(aes(fill=value))  + 
+ labs(fill="% of population\nwith college degree") +
+    scale_fill_viridis() +
+  ggtitle("Educational Attainment by County for California, 2018") +
+  theme_classic()
+
+```
+
+
