@@ -1,5 +1,5 @@
 ---
-title: "Module-5-Basic-Data-Manipulation"
+title: "Skill-2-Data-Types-and-Structures"
 output:
   html_document:
     df_print: paged
@@ -12,6 +12,10 @@ The previous lesson kind of jumped right into data analysis without much of the 
 The caveat that applies here (and all subsequent lessons) is: these are just some nuggets that I think are important to understand based on my own experience using R for Social Science research. I don't claim any authority on "how to learn R programming" or "how to write elegant code." To the extent that I have anything valuable to offer it's just that I've trial-and-errored my way through a lot of different Social Science methods in R. 
 
 This lesson is meant to be a kernel of sorts, my interpretation of the most compact presentation of a set of skills that will allow you understand future (more complex) applications without too much hassle.
+
+```{r}
+library(here)
+```
 
 ## Working with Vectors and Lists
 
@@ -328,14 +332,14 @@ In this case, an example will probably go futher than an explanation. Here is a 
 The landings data are contained in the .csv file "ftl_sample.csv". These data contain "fish tickets" which are the commercial landings receipts indicating how much of each market category (species) and grade were sold, and the price at which they were sold. Each observation (row) in the data is a "line" of the fish ticket. For the present purposes it is sufficient to understand that each fish ticket may have several lines depending on how much of each different species was transacted.
 
 ```{r}
-ftl_example <- read.csv('data/ftl_example.csv')
+ftl_example <- read.csv(here('data/ftl_example.csv'))
 ftl_example
 ```
 
 In this example, I'm also going to join these data with a separate data file containing detailed information on fishing vessels. 
 
 ```{r warnings=F}
-vessel_info <- read.csv('data/vessel_info.csv')
+vessel_info <- read.csv(here('data/vessel_info.csv'))
 vessel_info
 ```
 
@@ -372,8 +376,8 @@ merge(ftl2,vessel_info,by=c('vessel_id'))
 The dplyr way to do this would be as follows:
 
 ```{r}
-ftl <- read.csv('data/ftl_example.csv')
-vessel_info <- read.csv('data/vessel_info.csv')
+ftl <- read.csv(here('data/ftl_example.csv'))
+vessel_info <- read.csv(here('data/vessel_info.csv'))
 
 ftl <- ftl %>% filter(port_code %in% c("PRN","MNT","ERK")) %>%
                group_by(vessel_id, landing_date, management_group, port_code) %>%

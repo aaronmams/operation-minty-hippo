@@ -1,5 +1,5 @@
 ---
-title: "Module-5-Data-Manipulation-v.2"
+title: "Skill-3-Data-Wrangling"
 author: "aaron mamula"
 date: "5/26/2020"
 output: html_document
@@ -164,7 +164,8 @@ The data come from the [World Bank Development Indicators](https://databank.worl
 I have retrieved the data from 2000-2019 for 6 Regional Aggregates of Countries. I have included these data here and we can view them in thier original wide form: 
 
 ```{r}
-gpi <- read.csv('data/WorldBank_GPI_2000-2018.csv')
+library(here)
+gpi <- read.csv(here('data/WorldBank_GPI_2000-2018.csv'))
 gpi
 ```
 

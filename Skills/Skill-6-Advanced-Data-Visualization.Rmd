@@ -1,5 +1,5 @@
 ---
-title: "Module-9-Advanced-Visualizations-v.1"
+title: "Skill-6-Advanced-Visualizations-v.1"
 author: "aaron mamula"
 date: "5/8/2020"
 output: html_document
@@ -16,11 +16,13 @@ library(data.table)
 library(ggplot2)
 library(RJSONIO)
 library(viridis)
+library(here)
+library(ggthemes)
 ```
 
 Here's what's happening in this module: 
 
-Working with the Census Bureau ACS data from Module 7 I'm going to create an informative map using the spatial data package *sf*. The exercise will proceed more-or-less like this:
+Working with the Census Bureau ACS data from Skills-5 I'm going to create an informative map using the spatial data package *sf*. The exercise will proceed more-or-less like this:
 
 * get the shapefile for CDP boundaries from the Census TIGER Data Mart
 * join the boundry shapefile with the data series 
@@ -42,9 +44,9 @@ As a first step, read the shapefile with the county boundaries and plot them jus
 
 ```{r}
 
-county.lines <- st_read('data/shapefiles/tl_2019_us_county/tl_2019_us_county.shp')
+ca.counties <- st_read(here('data/CA_Counties/CA_Counties_TIGER2016.shp'))
 
-str(county.lines)
+str(ca.counties)
 ```
 
 The thing to note from above is that we have an data frame-looking thing that is object class *sf* with a variety of spatial data type identifiers. The [Simple Features Package](https://r-spatial.github.io/sf/articles/sf1.html) really simplifies working with spatial data because it organizes things in a familiar data-frame looking way.
@@ -52,14 +54,12 @@ The thing to note from above is that we have an data frame-looking thing that is
 We can display these county boundaries on a map using the *ggplot()* method. 
 
 ```{r}
-library(ggthemes)
-ca.counties <- county.lines %>% filter(STATEFP=='06')
 ggplot(ca.counties) + geom_sf() + theme_economist_white()
 ```
 
 ## A Real Map
 
-In the last section I made a base map. This was a map of California county boundaries. Here, I'm going to draw on the skills from [Module-7-Data-Import-v.2.2](Module-7-Data-Import-v.2.2.Rmd) and pull some data from the 2018 ACS to use with the basemap.
+In the last section I made a base map. This was a map of California county boundaries. Here, I'm going to draw on the skills from ```SKills-5-Advanced-Data-Import-v.2``` and pull some data from the 2018 ACS to use with the basemap.
 
 ### Get the Educational Attainment Series and Join with Spatial Boundaries
 
@@ -101,7 +101,7 @@ head(unique(edu$name))
 
 County names from the Census boundaries shapefile:
 ```{r}
-head(unique(county.lines$NAME[which(county.lines$STATEFP=='06')]))
+head(unique(ca.counties$NAME))
 ```
 
 It looks to me like if I just drop the "County, California" part from the ACS name identifiers than the two will be conformable. Let's try:
@@ -116,8 +116,7 @@ edu <- edu %>% select(-name)
 
 Try joining and see what doesn't work
 ```{r}
-
-ca.counties <- county.lines %>% filter(STATEFP=='06') %>% left_join(edu,by=c('NAME'))
+ca.counties <- ca.counties %>%  left_join(edu,by=c('NAME'))
 ca.counties <- st_as_sf(ca.counties)  
 ```
 

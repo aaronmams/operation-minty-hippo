@@ -1,6 +1,8 @@
 ---
-title: "Module 6: Introductory Data Visualization"
-output: html_notebook
+title: 'SKill-4-Data-Visualization'
+output:
+  html_document:
+    df_print: paged
 ---
 
 First off, "Introductory Data Visualization" is kind of a lie. Most introductory data visualization lessons start with R's Base Graphics methods like ```plot()```. I'm skipping past that and jumping right into plotting with ```ggplot2()```. The reasons are simple:
@@ -36,6 +38,7 @@ library(ggplot2)
 library(ggthemes)
 library(lubridate)
 library(viridis)
+library(here)
 ```
 
 ```{r}
@@ -132,7 +135,7 @@ Grouping variables in boxplots can be useful for things like visualizing changes
 # Daily Data from Kaggle on Weather in Australia 2007-2017.
 # https://www.kaggle.com/jsphyg/weather-dataset-rattle-package
 
-aus <- read.csv('data/weatherAUS.csv') %>% 
+aus <- read.csv(here('data/weatherAUS.csv')) %>% 
         mutate(date=as.Date(Date))
 
 can <- aus %>% mutate(month=month(Date),year=year(Date)) %>%
@@ -151,7 +154,7 @@ A histogram is particular kind of bar chart and ```ggplot``` has a geometry meth
 
 ```{r}
 # read in a sample of some VMS observation I have from groundfish trawlers
-vms <- read.csv('data/vms_fishing_export.csv') %>% 
+vms <- read.csv(here('data/vms_fishing_export.csv')) %>% 
         mutate(date_time=as.POSIXct(date_time,format='%Y-%m-%d %H:%M:%S')) %>% 
          filter(year(date_time)==2014) %>% 
            mutate(activity=ifelse(fishing==1,"fishing","not fishing"))  

@@ -1,5 +1,5 @@
 ---
-title: "Module 7-Data Import v.2.1"
+title: "Skill-5-Advanced-Data-Import-v.1"
 author: "aaron mamula"
 date: "4/9/2020"
 output: html_document
@@ -28,6 +28,7 @@ I'm going to do this is kind of reverse order and put the fun code part first...
 library(RMySQL)
 library(DBI)
 library(dplyr)
+library(here)
 ```
 
 ```{r}
@@ -92,9 +93,10 @@ dbConnect(drv = RMySQL::MySQL(),...,
 
 This next part is not crucial for you all to know but it's relevant. I got the database endpoint for this application by looking at the *Connectivity and Security* tab of my AWS RDS portol:
 
-![](figures/aws-rds-dashboard.png)
-
-![](figures/aws-rds-endpoint.png)
+```{r}
+knitr::include_graphics(here('figures/aws-rds-dashboard.png'))
+knitr::include_graphics(here('figures/aws-rds-endpoint.png'))
+```
 
 ### Connection Credentials/Details
 
@@ -169,7 +171,7 @@ PACFIN =
 
   (DESCRIPTION =
 
-    (ADDRESS = (PROTOCOL = TCP)(HOST = hostname.host.org)(PORT = 2045))
+    (ADDRESS = (PROTOCOL = TCP)(HOST = hostname.host.org)(PORT = port))
 
     (CONNECT_DATA =
 

@@ -12,6 +12,7 @@ library(readr)
 library(knitr)
 library(kableExtra)
 library(data.table)
+library(here)
 ```
 The objective of this module is to get everyone comfortable with importing spreadsheet type data from local sources. My perception (which may or may not be true) of Social Scientists research within NMFS is that it leverages a pretty wide range of data sources. Although I see us moving more in the direction of setting up and utilizing programmatic data streams, many of us still rely (to varying degrees) on data collected under project specific circumstances.
 
@@ -38,7 +39,7 @@ Here, I'm going to use a fun dataset from Kaggle on the [top 50 most downloaded 
 The read.csv() method is a base R functionality for reading comma separated value data file formats.
 
 ```{r}
-songs <- read.csv(file='data/spotify-top50.csv')
+songs <- read.csv(file=here('data/spotify-top50.csv'))
 head(songs)
 ```
 
@@ -49,7 +50,7 @@ The read_csv() method is part of the tidyr ecosystem and comes from the readr pa
 Practically speaking, it works just like the read.csv() method.
 
 ```{r}
-songs.dplyr <- read_csv(file='data/spotify-top50.csv')
+songs.dplyr <- read_csv(file=here('data/spotify-top50.csv'))
 head(songs)
 ```
 
@@ -58,7 +59,7 @@ head(songs)
 The fread() method comes from the data.table package which is a library of functions that work really fast on large data sets.
 
 ```{r}
-songs.dt <- fread('data/spotify-top50.csv')
+songs.dt <- fread(here('data/spotify-top50.csv'))
 head(songs.dt)
 ```
 
@@ -74,17 +75,17 @@ Here is a benchmarking example. For benchmarking we'll use a rather large data s
 #NOTE: THIS WILL TAKE ABOUT 3 MINUTES TO RUN
 
 t <- Sys.time()
-flights <- read.csv(file='data/flights.csv')
+flights <- read.csv(file=here('data/flights_small.csv'))
 t.base <- Sys.time() - t
 
 
 t <- Sys.time()
-flights <- read_csv(file='data/flights.csv')
+flights <- read_csv(file=here('data/flights_small.csv'))
 t.dplyr <- Sys.time() - t
 
 
 t <- Sys.time()
-flights <- fread('data/flights.csv')
+flights <- fread(here('data/flights_small.csv'))
 t.dt <- Sys.time() - t
 
 
@@ -110,7 +111,7 @@ gsub("<thead>.*</thead>", "", x)
 because the 2nd line doesn't have a date and the 4th line doesn't have a state, attempts to use stuff like read.csv() will be problematic because columns don't line up. Here readlines() will read each line separately.
 
 ```{r}
-dat <- readLines(con='data/readlines-example.txt',warn=F)
+dat <- readLines(con=here('data/readlines-example.txt'),warn=F)
 str(dat)
 ```
 
