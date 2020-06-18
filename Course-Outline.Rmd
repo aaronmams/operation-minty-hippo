@@ -87,6 +87,9 @@ The lesson will demonstrate some interesting features of R and GitHub integratio
 * R and R Markdown was used to create a dynamic document
 * The interactive document was published to the web with GitHub pages to promote stakeholder engagement and invite public comment
 
+### Functional Programing & Bioeconomic Models
+
+This is a placeholder for Allen Chen (NWFSC) who agreed to lead a topical discussion on functional programming, bio-economic modeling, and use of the R Library ```FLR``` for bio-economic modeling and management strategy evaluation.
 
 ### Advanced Visualization
 
