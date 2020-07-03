@@ -5,11 +5,15 @@ date: "2/25/2020"
 output: html_document
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
-
 # {.tabset .tabset-fade .tabset-pills}
+
+## About the Course
+
+There is R "the language" and then there is R "the experience." Learning R "the language" is probably just like learning any other programming language and I don't feel qualified to advise anyone on the best way to do that. I program mostly in R and a little in Python, SQL, java, Visual Basic, and C. I don't have any particularly inspiring thoughts on how to learn "R the language." I just kinda started writing code, getting frustrated when it didn't work, changing little things, trying again, and doing that over and over until stuff started working.
+
+To the extent that I have anything valuable to offer you, it's my understanding of R "the experience." By that I mean using the various tools and integrations in the R ecosystem to streamline data analysis.  
+
+That's a long-winded way of saying that this isn't a course on learning R programming. It's a course on learning to use R to do data analysis. Developing some R progamming dexterity will be a natural by-product of the course but it's not the primary focus. 
 
 ## Course Design 
 
@@ -42,7 +46,6 @@ In each individual lesson you will find a file called *START HERE* with the exte
 In addition to their availability within the R Studio Cloud classromm space, all code files and data for the course are available in the following GitHub repository:
 
 https://github.com/aaronmams/operation-minty-hippo
-
 
 ## Skills {.tabset .tabset-fade .tabset-pills}
 
@@ -87,9 +90,13 @@ The lesson will demonstrate some interesting features of R and GitHub integratio
 * R and R Markdown was used to create a dynamic document
 * The interactive document was published to the web with GitHub pages to promote stakeholder engagement and invite public comment
 
-### Functional Programing & Bioeconomic Models
+### Bio-economics and Functional Programming
 
-This is a placeholder for Allen Chen (NWFSC) who agreed to lead a topical discussion on functional programming, bio-economic modeling, and use of the R Library ```FLR``` for bio-economic modeling and management strategy evaluation.
+This is another place holder for Allen Chen (NWFSC). Allen agreed to do a demo on functional programming, bio-economic modeling, and use of the ```FLR``` Library.
+
+[FLR](https://flr-project.org/) is
+
+>a collection of tools for quantitative fisheries science, developed in the R language, that facilitates the construction of bio-economic simulation models of fisheries systems
 
 ### Advanced Visualization
 
